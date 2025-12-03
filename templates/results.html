@@ -27,31 +27,31 @@
     <details>
       <summary>Ver tabla de métricas</summary>
       <table>
-        <thead>
-          <tr>
-            <th>Modelo</th>
-            {% for metric_name in results[ list(results.keys())[0] ].keys() %}
-              <th>{{ metric_name }}</th>
+          <thead>
+            <tr>
+              <th>Modelo</th>
+              {% for metric_name in metric_names %}
+                <th>{{ metric_name }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for model_name, metrics in results.items() %}
+            <tr>
+              <td>{{ model_name }}</td>
+              {% for metric_name in metric_names %}
+                <td>
+                  {% if metrics[metric_name] is number %}
+                    {{ "%.4f"|format(metrics[metric_name]) }}
+                  {% else %}
+                    {{ metrics[metric_name] }}
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
             {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for model_name, metrics in results.items() %}
-          <tr>
-            <td>{{ model_name }}</td>
-            {% for metric_name, value in metrics.items() %}
-              <td>
-                {% if value is number %}
-                  {{ "%.4f"|format(value) }}
-                {% else %}
-                  {{ value }}
-                {% endif %}
-              </td>
-            {% endfor %}
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
     </details>
   </div>
 
