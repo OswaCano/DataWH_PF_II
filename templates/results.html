@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resultados - {{ problem_type }}</title>
+  <style>
+    body { font-family: system-ui, Arial; margin: 2rem; }
+    .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; background: #fafafa; }
+    h1, h2, h3 { margin: 0.2rem 0 0.8rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    .winner { background: #e8f5e9; border: 1px solid #9ccc65; }
+    .back { margin-top: 1rem; display: inline-block; }
+    img { max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #eee; }
+    .label { font-weight: 600; color: #333; }
+  </style>
+</head>
+<body>
+  <h1>Resultados - {{ problem_type }}</h1>
+  <p><span class="label">Objetivo:</span> {{ target }}</p>
+  <p><span class="label">Algoritmo ganador:</span> <span class="winner">{{ winner }}</span></p>
+
+  <div class="card">
+    <h2>Métricas comparativas</h2>
+    <img src="data:image/png;base64,{{ images.metrics }}" alt="Métricas comparativas">
+    <details>
+      <summary>Ver tabla de métricas</summary>
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            {% for metric_name in results[ list(results.keys())[0] ].keys() %}
+              <th>{{ metric_name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for model_name, metrics in results.items() %}
+          <tr>
+            <td>{{ model_name }}</td>
+            {% for metric_name, value in metrics.items() %}
+              <td>
+                {% if value is number %}
+                  {{ "%.4f"|format(value) }}
+                {% else %}
+                  {{ value }}
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </details>
+  </div>
+
+  {% if images.scatter %}
+  <div class="grid">
+    <div class="card">
+      <h2>Gráfica clave del ganador</h2>
+      <img src="data:image/png;base64,{{ images.scatter }}" alt="Predicción vs Real">
+    </div>
+    {% if images.residuals %}
+    <div class="card">
+      <h2>Residuos del ganador</h2>
+      <img src="data:image/png;base64,{{ images.residuals }}" alt="Residuos">
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if images.confusion %}
+  <div class="grid">
+    <div class="card">
+      <h2>Matriz de confusión (ganador)</h2>
+      <img src="data:image/png;base64,{{ images.confusion }}" alt="Matriz de confusión">
+    </div>
+    {% if images.roc %}
+    <div class="card">
+      <h2>Curva ROC (si binaria)</h2>
+      <img src="data:image/png;base64,{{ images.roc }}" alt="Curva ROC">
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <a class="back" href="/">← Volver a cargar otro dataset</a>
+</body>
+</html>
